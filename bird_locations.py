@@ -6,6 +6,7 @@ from branca.colormap import LinearColormap
 from streamlit_folium import st_folium
 import json
 from pathlib import Path
+from collections import defaultdict
 
 st.set_page_config(layout="wide")
 
@@ -112,15 +113,72 @@ else:
 
 # ---- Add markers ----
 for _, row in agg.iterrows():
-    species_html = ""
+
+    species_dict = defaultdict(list)
+
     for sp, dt, ct in zip(row["species_list"], row["dates"], row["counts"]):
-        species_html += f"{sp} — {dt} — {ct}<br>"
+        species_dict[sp].append((dt, ct))
+
+    species_html = ""
+
+    for species, records in sorted(species_dict.items(), key=lambda x: len(x[1]), reverse=True):
+
+        records_html = "".join(
+            f"{dt} — {ct}<br>" for dt, ct in records
+        )
+
+        species_html += f"""
+        <details style="margin-bottom:4px;">
+            <summary style="
+                cursor:pointer;
+                font-weight:bold;
+                background:#eef3ff;
+                padding:4px;
+                border-radius:4px;
+            ">
+            🐦 {species} ({len(records)})
+            </summary>
+
+            <div style="
+                padding-left:10px;
+                margin-top:4px;
+                font-size:13px;
+                max-height:150px;
+                overflow-y:auto;
+            ">
+                {records_html}
+            </div>
+        </details>
+        """
 
     popup_html = f"""
-    <b>{row['locName']}</b><br>
-    <b>Species count:</b> {row['n_species']}<br>
+    <div style="width:270px; font-family:sans-serif;">
+
+    <b style="font-size:15px;">{row['locName']}</b><br>
+    <b>Total species:</b> {row['n_species']}<br>
     <b>Average rank:</b> {row['avg_rank']:.2f}<br><br>
+
+    <details style="border:1px solid #ccc; border-radius:6px; padding:4px;">
+    <summary style="
+        cursor:pointer;
+        font-weight:bold;
+        background:#f2f2f2;
+        padding:6px;
+        border-radius:4px;
+    ">
+    📋 Show species
+    </summary>
+
+    <div style="
+        max-height:250px;
+        overflow-y:auto;
+        margin-top:6px;
+    ">
     {species_html}
+    </div>
+
+    </details>
+    </div>
     """
 
     color_val = colormap(row["avg_rank"]) if colormap and pd.notna(row["avg_rank"]) else "blue"
@@ -133,6 +191,7 @@ for _, row in agg.iterrows():
         fill_opacity=0.85,
         popup=folium.Popup(popup_html, max_width=300)
     ).add_to(m)
+
 
 # ---- Display map ----
 st.subheader("Iceland trip March 2026")

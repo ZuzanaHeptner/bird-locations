@@ -1,0 +1,12 @@
+[project]
+name = "bird-finder"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "folium>=0.20.0",
+    "requests>=2.32.5",
+    "streamlit>=1.54.0",
+    "streamlit-folium>=0.26.1",
+]
