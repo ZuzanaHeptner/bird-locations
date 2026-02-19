@@ -11,16 +11,22 @@ from collections import defaultdict
 st.set_page_config(layout="wide")
 
 # ---- Load historic data ----
-dfs = []
-files = list(Path("ebird_IS_historic").rglob("*.json"))
-for file in files:
-    data = json.loads(file.read_text())
-    if data:
-        df = pd.DataFrame(data)
-        df["source_file"] = file.name
-        dfs.append(df)
+# dfs = []
+# files = list(Path("ebird_IS_historic").rglob("*.json"))
+# for file in files:
+    # data = json.loads(file.read_text())
+    # if data:
+        # df = pd.DataFrame(data)
+        # df["source_file"] = file.name
+        # dfs.append(df)
 
-df_is_all = pd.concat(dfs, ignore_index=True)
+# df_is_all = pd.concat(dfs, ignore_index=True)
+
+# # ---- Save historic data to parquet ----
+# df_is_all.to_parquet("ebird_IS_historic.parquet", engine="pyarrow", index=False)
+
+# ---- Load historic data in parquet ----
+df_is_all = pd.read_parquet("ebird_IS_historic.parquet", engine="pyarrow")
 
 # ---- Wishlist of species ----
 wishlist = [
