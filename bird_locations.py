@@ -186,6 +186,11 @@ for _, row in agg.iterrows():
     </details>
     </div>
     """
+    
+    # Add Google Maps link
+    gm_url = f"https://www.google.com/maps/search/?api=1&query={row['lat']},{row['lng']}"
+    popup_html += f'<br><a href="{gm_url}" target="_blank" style="color:blue;">📍 Open in Google Maps</a>'
+
 
     color_val = colormap(row["avg_rank"]) if colormap and pd.notna(row["avg_rank"]) else "blue"
 
